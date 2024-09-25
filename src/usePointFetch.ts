@@ -54,10 +54,13 @@ const usePointFetch = <T extends Record<string, any> = Record<string, any>>(init
         ))
     }
 
-    const submit = (options: Config) => PointFetch({
+    const submit = (options: Omit<Config, 'baseURL'>) => PointFetch({
         ...options,
         baseURL: context?.baseURL,
-        headers: context?.headers,
+        headers: {
+            ...context?.headers,
+            ...options.headers
+        },
         onStart: () => {
             !processing && setProcessing(true);
             typeof options.onStart === 'function' && options.onStart();
@@ -69,28 +72,23 @@ const usePointFetch = <T extends Record<string, any> = Record<string, any>>(init
         onError: (err, res) => {
             setProcessing(false);
             typeof options.onError === 'function' && options.onError(err, res)
-            if (res.status === 500) {
-                context?.onServerError && context.onServerError(res)
-            } else if (res.status === 401) {
-                context?.onUnAuthenticated && context.onUnAuthenticated(res)
-            } else if (res.status === 403) {
-                context?.onForbidden && context.onForbidden(res)
-            } else {
-                setErrors(err)
-            }
+            setErrors(err)
         },
+        onServerError: (res) => context?.onServerError && context.onServerError(res),
+        onUnAuthenticated: (res) => context?.onUnAuthenticated && context.onUnAuthenticated(res),
+        onForbidden: (res) => context?.onForbidden && context.onForbidden(res),
         onFinish: () => options.onFinish && options.onFinish()
     })
 
-    const get = (options: BaseConfig) => submit({ ...options, method: 'get', data: {} });
+    const get = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'get', data: {} });
 
-    const post = (options: BaseConfig) => submit({ ...options, method: 'post', data });
+    const post = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'post', data });
 
-    const put = (options: BaseConfig) => submit({ ...options, method: 'put', data });
+    const put = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'put', data });
 
-    const patch = (options: BaseConfig) => submit({ ...options, method: 'patch', data });
+    const patch = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'patch', data });
 
-    const destroy = (options: BaseConfig) => submit({ ...options, method: 'delete', data });
+    const destroy = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'delete', data });
 
     return {
         get,
