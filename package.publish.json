@@ -1,0 +1,24 @@
+{
+    "name": "point-fetch-react",
+    "version": "1.0.0-beta",
+    "author": "Hassan Raza",
+    "description": "React Hook for fetching data easy to use with events",
+    "license": "MIT",
+    "main": "index.js",
+    "types": "index.d.ts",
+    "keywords": [
+        "point-fetch-react"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hr1938082/PointFetchReact.git"
+    },
+    "bugs": {
+        "url": "https://github.com/hr1938082/PointFetchReact/issues"
+    },
+    "peerDependencies": {
+        "point-fetch": "^1.0.0-beta.0.1",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0"
+    }
+}

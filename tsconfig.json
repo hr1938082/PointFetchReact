@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // Specify ECMAScript target version
+    "module": "ESNext", // Specify module code generation
+    "declaration": true, // Generate .d.ts files
+    "declarationDir": "./dist", // Output directory for declaration files
+    "emitDeclarationOnly": true, // Only emit .d.ts files
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "strict": true, // Enable all strict type-checking options
+    "jsx": "react-jsx", // Specify JSX code generation (React 17+)
+    "moduleResolution": "Bundler",
+  },
+  "include": [
+    "src/**/*"
+  ], // Include all source files
+}
