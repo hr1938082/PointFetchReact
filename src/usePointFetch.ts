@@ -74,9 +74,18 @@ const usePointFetch = <T extends Record<string, any> = Record<string, any>>(init
             typeof options.onError === 'function' && options.onError(err, res)
             setErrors(err)
         },
-        onServerError: (res) => context?.onServerError && context.onServerError(res),
-        onUnAuthenticated: (res) => context?.onUnAuthenticated && context.onUnAuthenticated(res),
-        onForbidden: (res) => context?.onForbidden && context.onForbidden(res),
+        onServerError: (res) => {
+            context?.onServerError && context.onServerError(res);
+            options.onServerError && options.onServerError(res);
+        },
+        onUnAuthenticated: (res) => {
+            context?.onUnAuthenticated && context.onUnAuthenticated(res);
+            options.onUnAuthenticated && options.onUnAuthenticated(res);
+        },
+        onForbidden: (res) => {
+            context?.onForbidden && context.onForbidden(res);
+            options.onForbidden && options.onForbidden(res);
+        },
         onFinish: () => options.onFinish && options.onFinish()
     })
 
