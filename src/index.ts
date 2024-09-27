@@ -1,5 +1,5 @@
-import usePointFetch from "./usePointFetch";
+import useFetch from "./useFetch";
 import Provider from "./Provider";
 
-export default usePointFetch;
+export default useFetch;
 export { Provider }

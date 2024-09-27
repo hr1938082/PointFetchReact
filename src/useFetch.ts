@@ -2,30 +2,38 @@ import { useContext, useState } from "react";
 import Context from "./Context";
 import PointFetch, { BaseConfig, Config } from "point-fetch";
 
-export type usePointFetchStateKeyType<T extends Record<string, any>> = keyof T;
+type StateKey<T> = Extract<keyof T, string>
 
-const usePointFetch = <T extends Record<string, any> = Record<string, any>>(initialState: T, initialProcessing?: boolean) => {
+type Error<T> = {
+    [k in keyof T]?: string
+}
+
+type AnyError<T> = Error<T> & {
+    [keys: string]: string | undefined
+}
+
+const useFetch = <T extends Record<string, any> = Record<string, any>>(initialState: T, initialProcessing?: boolean) => {
     const context = useContext(Context);
     const [data, setData] = useState<typeof initialState>(initialState);
-    const [errors, setErrors] = useState<Record<usePointFetchStateKeyType<typeof initialState>, any> | Record<string, any>>({});
+    const [errors, setErrors] = useState<AnyError<T>>({});
     const [processing, setProcessing] = useState(initialProcessing ?? false);
 
-    const handleData = (key: usePointFetchStateKeyType<typeof initialState> | object, value?: string) => {
+    const handleData = (key: StateKey<T> | T & Record<string, any>, value?: string) => {
         setData(value !== undefined
-            ? { ...data, [key as usePointFetchStateKeyType<typeof initialState>]: value }
+            ? { ...data, [key as StateKey<T>]: value }
             : typeof key === 'object' ? { ...data, ...key } : { ...data }
         );
     }
 
-    const reset = (...fields: usePointFetchStateKeyType<typeof initialState>[]) => {
+    const reset = (...fields: StateKey<T>[]) => {
         if (fields.length === 0) {
             setData(initialState)
         } else {
             setData(
                 Object.keys(initialState)
-                    .filter((key) => fields.includes(key))
+                    .filter((key) => fields.some(field => field === key))
                     .reduce((carry, key) => {
-                        const newkey: usePointFetchStateKeyType<typeof initialState> = key;
+                        const newkey = key as StateKey<T>;
                         carry[newkey] = initialState[newkey]
                         return carry
                     }, { ...data }),
@@ -33,21 +41,22 @@ const usePointFetch = <T extends Record<string, any> = Record<string, any>>(init
         }
     }
 
-    const handleErrors = (key: usePointFetchStateKeyType<typeof initialState>, value: string) => {
+    const handleErrors = (key: StateKey<T> | T & Record<string, any>, value?: string) => {
         setErrors(
-            errors => ({
-                ...errors,
-                ...(value ? { [key]: value } : { key: '' }),
-            })
+            errors => (
+                value !== undefined
+                    ? { ...errors, [key as StateKey<T>]: value }
+                    : typeof key === 'object' ? key : errors
+            )
         )
     }
 
-    const clearError = (...fields: usePointFetchStateKeyType<typeof initialState>[]) => {
+    const clearError = (...fields: StateKey<T>[]) => {
         setErrors((errors: any) => (
             Object.keys(errors).reduce(
-                (carry, field) => ({
+                (carry, key) => ({
                     ...carry,
-                    ...(fields.length > 0 && !fields.includes(field) ? { [field]: errors[field] } : {}),
+                    ...(fields.length > 0 && !fields.some(field => field === key) ? { [key]: errors[key] } : {}),
                 }),
                 {}
             )
@@ -116,4 +125,4 @@ const usePointFetch = <T extends Record<string, any> = Record<string, any>>(init
     }
 }
 
-export default usePointFetch
+export default useFetch
