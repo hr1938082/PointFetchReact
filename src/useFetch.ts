@@ -1,66 +1,42 @@
 import { useContext, useState } from "react";
 import Context from "./Context";
 import PointFetch, { BaseConfig, Config } from "point-fetch";
+import useValidator, { ValidatorOptions } from "point-validator-react";
 
 type StateKey<T> = Extract<keyof T, string>
 
-type Error<T> = {
-    [k in keyof T]?: string
+interface Options<T extends Record<string, any>> extends Omit<ValidatorOptions<T>, 'values'> {
+    state: T,
+    processing?: boolean
 }
 
-type AnyError<T> = Error<T> & {
-    [keys: string]: string | undefined
-}
-
-const useFetch = <T extends Record<string, any> = Record<string, any>>(initialState: T, initialProcessing?: boolean) => {
+const useFetch = <T extends Record<string, any>>(options: Options<T>) => {
     const context = useContext(Context);
-    const [data, setData] = useState<typeof initialState>(initialState);
-    const [errors, setErrors] = useState<AnyError<T>>({});
-    const [processing, setProcessing] = useState(initialProcessing ?? false);
+    const [Data, setData] = useState<typeof options.state>(options.state);
+    const [Processing, setProcessing] = useState(options.processing ?? false);
+    const { validate, Errors, setErrors, clearError } = useValidator({ values: Data, rules: options.rules, message: options.message })
 
     const handleData = (key: StateKey<T> | T & Record<string, any>, value?: string) => {
         setData(value !== undefined
-            ? { ...data, [key as StateKey<T>]: value }
-            : typeof key === 'object' ? { ...data, ...key } : { ...data }
+            ? { ...Data, [key as StateKey<T>]: value }
+            : typeof key === 'object' ? { ...Data, ...key } : { ...Data }
         );
     }
 
     const reset = (...fields: StateKey<T>[]) => {
         if (fields.length === 0) {
-            setData(initialState)
+            setData(options.state)
         } else {
             setData(
-                Object.keys(initialState)
+                Object.keys(options.state)
                     .filter((key) => fields.some(field => field === key))
                     .reduce((carry, key) => {
                         const newkey = key as StateKey<T>;
-                        carry[newkey] = initialState[newkey]
+                        carry[newkey] = options.state[newkey]
                         return carry
-                    }, { ...data }),
+                    }, { ...Data }),
             )
         }
-    }
-
-    const handleErrors = (key: StateKey<T> | T & Record<string, any>, value?: string) => {
-        setErrors(
-            errors => (
-                value !== undefined
-                    ? { ...errors, [key as StateKey<T>]: value }
-                    : typeof key === 'object' ? key : errors
-            )
-        )
-    }
-
-    const clearError = (...fields: StateKey<T>[]) => {
-        setErrors((errors: any) => (
-            Object.keys(errors).reduce(
-                (carry, key) => ({
-                    ...carry,
-                    ...(fields.length > 0 && !fields.some(field => field === key) ? { [key]: errors[key] } : {}),
-                }),
-                {}
-            )
-        ))
     }
 
     const submit = (options: Omit<Config, 'baseURL'>) => PointFetch({
@@ -71,7 +47,7 @@ const useFetch = <T extends Record<string, any> = Record<string, any>>(initialSt
             ...options.headers
         },
         onStart: () => {
-            !processing && setProcessing(true);
+            !Processing && setProcessing(true);
             typeof options.onStart === 'function' && options.onStart();
         },
         onSuccess: (res) => {
@@ -98,15 +74,35 @@ const useFetch = <T extends Record<string, any> = Record<string, any>>(initialSt
         onFinish: () => options.onFinish && options.onFinish()
     })
 
-    const get = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'get', data: {} });
+    const get = (options: Omit<BaseConfig, 'baseURL'>) => submit({
+        ...options,
+        method: 'get',
+        data: {}
+    });
 
-    const post = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'post', data });
+    const post = (options: Omit<BaseConfig, 'baseURL'>) => submit({
+        ...options,
+        method: 'post',
+        data: Data
+    });
 
-    const put = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'put', data });
+    const put = (options: Omit<BaseConfig, 'baseURL'>) => submit({
+        ...options,
+        method: 'put',
+        data: Data
+    });
 
-    const patch = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'patch', data });
+    const patch = (options: Omit<BaseConfig, 'baseURL'>) => submit({
+        ...options,
+        method: 'patch',
+        data: Data
+    });
 
-    const destroy = (options: Omit<BaseConfig, 'baseURL'>) => submit({ ...options, method: 'delete', data });
+    const destroy = (options: Omit<BaseConfig, 'baseURL'>) => submit({
+        ...options,
+        method: 'delete',
+        data: Data
+    });
 
     return {
         get,
@@ -114,13 +110,14 @@ const useFetch = <T extends Record<string, any> = Record<string, any>>(initialSt
         put,
         patch,
         delete: destroy,
-        data,
+        Data,
         setData: handleData,
-        setProcessing,
-        processing,
         reset,
-        errors,
-        setErrors: handleErrors,
+        setProcessing,
+        Processing,
+        Errors,
+        setErrors,
+        validate,
         clearError
     }
 }
