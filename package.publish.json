@@ -1,6 +1,6 @@
 {
     "name": "point-fetch-react",
-    "version": "1.0.0-beta.11",
+    "version": "1.0.0-beta.12",
     "author": "Hassan Raza",
     "description": "React Hook for fetching data easy to use with events",
     "license": "MIT",
@@ -18,7 +18,7 @@
         "url": "https://github.com/hr1938082/PointFetchReact/issues"
     },
     "peerDependencies": {
-        "point-fetch": "^1.0.0-beta.1",
+        "point-fetch": "^1.0.0-beta.2",
         "point-validator-react": "^1.0.0-beta.5",
         "react": "^18.0.0",
         "react-dom": "^18.0.0"

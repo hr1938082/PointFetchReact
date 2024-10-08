@@ -42,10 +42,7 @@ const useFetch = <T extends Record<string, any>>(options: Options<T>) => {
     const submit = (options: Omit<Config, 'baseURL'>) => PointFetch({
         ...options,
         baseURL: context?.baseURL,
-        headers: {
-            ...context?.headers,
-            ...options.headers
-        },
+        authorization: options.authorization ?? context?.authorization,
         onStart: () => {
             !Processing && setProcessing(true);
             typeof options.onStart === 'function' && options.onStart();
