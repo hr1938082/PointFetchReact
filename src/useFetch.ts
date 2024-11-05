@@ -106,7 +106,7 @@ const useFetch = <T extends Record<string, any>>(options: Options<T>) => {
         post,
         put,
         patch,
-        delete: destroy,
+        destroy,
         Data,
         setData: handleData,
         reset,
