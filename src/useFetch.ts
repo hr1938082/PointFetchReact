@@ -10,13 +10,13 @@ interface Options<T extends Record<string, any>> extends Omit<ValidatorOptions<T
     processing?: boolean
 }
 
-const useFetch = <T extends Record<string, any>>(options: Options<T>) => {
+const useFetch = <T extends Record<string, any>>(options: Partial<Options<T>> = {}) => {
     const context = useContext(Context);
-    const [Data, setData] = useState<typeof options.state>(options.state);
+    const [Data, setData] = useState<T>(options.state ?? ({} as T));
     const [Processing, setProcessing] = useState(options.processing ?? false);
     const { validate, Errors, setErrors, clearError } = useValidator({ values: Data, rules: options.rules, message: options.message })
 
-    const handleData = (key: StateKey<T> | T & Record<string, any>, value?: string) => {
+    const handleData = (key: StateKey<T> | T & Record<string, any>, value?: any) => {
         setData(value !== undefined
             ? { ...Data, [key as StateKey<T>]: value }
             : typeof key === 'object' ? { ...Data, ...key } : { ...Data }
@@ -25,14 +25,14 @@ const useFetch = <T extends Record<string, any>>(options: Options<T>) => {
 
     const reset = (...fields: StateKey<T>[]) => {
         if (fields.length === 0) {
-            setData(options.state)
+            setData(options.state ?? ({} as T))
         } else {
             setData(
-                Object.keys(options.state)
+                Object.keys(options.state ?? ({} as T))
                     .filter((key) => fields.some(field => field === key))
                     .reduce((carry, key) => {
                         const newkey = key as StateKey<T>;
-                        carry[newkey] = options.state[newkey]
+                        carry[newkey] = options.state?.[newkey] ?? ({} as T)[newkey]
                         return carry
                     }, { ...Data }),
             )
