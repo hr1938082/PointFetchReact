@@ -45,15 +45,15 @@ const useFetch = <T extends Record<string, any>>(options: Partial<Options<T>> = 
         authorization: options.authorization ?? context?.authorization,
         onStart: () => {
             !Processing && setProcessing(true);
-            typeof options.onStart === 'function' && options.onStart();
+            options.onStart && options.onStart();
         },
         onSuccess: (res) => {
             setProcessing(false);
-            typeof options.onSuccess === 'function' && options.onSuccess(res)
+            options.onSuccess && options.onSuccess(res)
         },
         onError: (err, res) => {
             setProcessing(false);
-            typeof options.onError === 'function' && options.onError(err, res)
+            options.onError && options.onError(err, res)
             setErrors(err)
         },
         onServerError: (res) => {
