@@ -72,33 +72,33 @@ const useFetch = <T extends Record<string, any>>(options: Partial<Options<T>> = 
     })
 
     const get = (options: Omit<BaseConfig, 'baseURL'>) => submit({
-        ...options,
         method: 'get',
-        data: {}
+        data: {},
+        ...options,
     });
 
     const post = (options: Omit<BaseConfig, 'baseURL'>) => submit({
-        ...options,
         method: 'post',
-        data: Data
+        data: Data,
+        ...options,
     });
 
     const put = (options: Omit<BaseConfig, 'baseURL'>) => submit({
-        ...options,
         method: 'put',
-        data: Data
+        data: Data,
+        ...options,
     });
 
     const patch = (options: Omit<BaseConfig, 'baseURL'>) => submit({
-        ...options,
         method: 'patch',
-        data: Data
+        data: Data,
+        ...options,
     });
 
     const destroy = (options: Omit<BaseConfig, 'baseURL'>) => submit({
-        ...options,
         method: 'delete',
-        data: Data
+        data: Data,
+        ...options,
     });
 
     return {
