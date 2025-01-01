@@ -1,6 +1,6 @@
 {
     "name": "point-fetch-react",
-    "version": "1.0.0-beta.19",
+    "version": "1.0.0-beta.20",
     "author": "Hassan Raza",
     "description": "React Hook for fetching data easy to use with events",
     "license": "MIT",
@@ -19,7 +19,7 @@
     },
     "peerDependencies": {
         "point-fetch": "^1.0.0-beta.6",
-        "point-validator-react": "^1.0.0-beta.5",
+        "point-validator-react": "^1.0.0-beta.6",
         "react": "^18.0.0",
         "react-dom": "^18.0.0"
     }
